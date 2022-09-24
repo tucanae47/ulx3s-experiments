@@ -7,7 +7,7 @@ all: $(PROJ).bit
 
 # $(PROJ).json: top.v hvsync_generator.v pll_25to100mhz.v	
 # $(PROJ).json: SSD1351.v oled.v	
-$(PROJ).json: top_checkered.v oled_video.v 
+$(PROJ).json: top_checkered.v oled_video.v pll_25to50mhz.v
 	yosys -p "synth_ecp5 -top top_checkered -json $@" $^
 
 $(PROJ)_out.config: $(PROJ).json

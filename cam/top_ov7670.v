@@ -30,17 +30,17 @@ module top_ov7670
       // c_img_pxls    = c_img_cols * c_img_rows,
       // c_nb_line_pxls = 9, // log2i(c_img_cols-1) + 1;
       // c_nb_img_pxls =  17,  //320*240=76,800 -> 2^17
-      // c_img_cols    = 160, // 8 bits
-      // c_img_rows    = 120, //  7 bits
-      // c_nb_line_pxls = 8, // log2i(c_img_cols-1) + 1;
-      // c_img_pxls    = c_img_cols * c_img_rows,
-      // c_nb_img_pxls =  15,  //160*120=19.200 -> 2^15
-      // QQVGA
-      c_img_cols    = 120, // 8 bits
-      c_img_rows    = 90, //  7 bits
-      c_nb_line_pxls = 7, // log2i(c_img_cols-1) + 1;
+      c_img_cols    = 160, // 8 bits
+      c_img_rows    = 120, //  7 bits
+      c_nb_line_pxls = 8, // log2i(c_img_cols-1) + 1;
       c_img_pxls    = c_img_cols * c_img_rows,
-      c_nb_img_pxls =  14,  //160*120=19.200 -> 2^15
+      c_nb_img_pxls =  15,  //160*120=19.200 -> 2^15
+      // QQVGA
+      // c_img_cols    = 120, // 8 bits
+      // c_img_rows    = 90, //  7 bits
+      // c_nb_line_pxls = 7, // log2i(c_img_cols-1) + 1;
+      // c_img_pxls    = c_img_cols * c_img_rows,
+      // c_nb_img_pxls =  14,  //160*120=19.200 -> 2^15
       // QQVGA /2
       //c_img_cols    = 80, // 7 bits
       //c_img_rows    = 60, //  6 bits
@@ -52,11 +52,12 @@ module top_ov7670
        c_nb_buf_blue  =  4,  // n bits for blue in the buffer (memory)
        // word width of the memory (buffer)
        c_nb_buf       =   c_nb_buf_red + c_nb_buf_green + c_nb_buf_blue
+
+
     )
     (input        rst,         // btn fire 1
      input        clk25mhz,    // 25mhz clk
-                               // btn fire 2:
-     input        btn2,          //select RGB -> YUV -> RGB test -> YUV test
+     input        btn2,          // btn fire 2:
      input        btnd,          // down:stop capture
      input        btnr,          // right: color processing
 
@@ -78,10 +79,26 @@ module top_ov7670
      output [3:0] vga_blue,
 
      output       vga_hsync,
-     output       vga_vsync
-
+     output       vga_vsync,
+    input  wire btn0,
+    output wire oled_csn,
+    output wire oled_clk,
+    output wire oled_mosi,
+    output wire oled_dc,
+    output wire oled_resn
     );
 
+
+  reg  winc, wclk, rclk;
+  reg  [DSIZE-1:0] wdata;
+  reg              wrst_n;
+  wire             wfull;
+  wire             awfull;
+  reg              rrst_n;
+  reg              rinc;
+  wire [DSIZE-1:0] rdata;
+  wire             rempty;
+  wire             arempty;
 
     wire          vga_visible;
     wire          vga_new_pxl;
@@ -115,11 +132,12 @@ module top_ov7670
 
     wire          clk50mhz;
 
-    wire          rgbmode;
+    wire          rgbmode = 1'b1;
     wire          testmode;
     wire          locked_wire;
     parameter     swap_r_b = 1'b1; // red and blue are swapped
 
+    wire clk = clk25mhz;
   // 50 MHz clock
    pll i_pll
      (
@@ -129,14 +147,6 @@ module top_ov7670
              );
 
 
-    mode_sel sw2_mode_sel 
-    (
-      .rst     (rst),
-      .clk     (clk50mhz),
-      .sig_in  (btn2),
-      .rgbmode (rgbmode),
-      .testmode(testmode)
-    );
 
    vga_sync i_vga 
    (
@@ -167,7 +177,6 @@ module top_ov7670
      .hsync      (vga_hsync_wr),
      .vsync      (vga_vsync_wr),
      .rgbmode    (rgbmode),
-     .testmode   (testmode),
      .col        (vga_col),
      .row        (vga_row),
      .frame_pixel(orig_img_pxl),
@@ -252,6 +261,93 @@ module top_ov7670
 
   assign led[7] = config_finished;
   assign led[6] = btnd;
+
+    parameter C_color_bits = 16; // 8 or 16
+
+  localparam DSIZE = c_nb_buf;
+  localparam ASIZE = c_nb_img_pxls;
+
+    wire [6:0] x;
+    wire [5:0] y;
+
+    reg [4:0] r= {5{1'b0}};
+    reg [4:0] g= {5{1'b0}};
+    reg [4:0] b= {5{1'b0}};
+
+   //  wire [15:0] color = x[3] ^ y[3] ? {5'd0, x[6:1], 5'd0} : {y[5:1], 6'd0, 5'd0};
+    wire [15:0] color = {r, g, b};
+
+    oled_video
+    #(
+        .c_init_file("ssd1351_oinit_xflip_16bit.mem"),
+        .c_x_size(128),
+        .c_y_size(128),
+        .c_color_bits(C_color_bits)
+    )
+    oled_video_inst
+    (
+        .clk(clk),
+        .reset(btn2),
+        .x(x),
+        .y(y),
+        .color(color),
+        .spi_csn(oled_csn),
+        .spi_clk(oled_clk),
+        .spi_mosi(oled_mosi),
+        .spi_dc(oled_dc),
+        .spi_resn(oled_resn)
+    );
+
+  
+  assign wclk = clk50mhz;
+  assign rclk = clk25mhz;
+//   assign rrst_n = btn0;
+  
+   
+  always @(posedge wclk) begin
+    if(rst) begin
+       winc<= 1;
+       wrst_n <= 0;
+    end
+    else begin
+          wdata <= capture_data;
+    end
+   end
+
+  always @(posedge rclk) begin
+    if(~btn0) begin
+      rinc <=1;
+      rrst_n<=0;
+    end
+    else begin
+          r  <= {1'b0, rdata[c_nb_buf-1: c_nb_buf-c_nb_buf_red]};
+          g  <= {1'b0, rdata[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue]};
+          b  <= {1'b0, rdata[c_nb_buf_blue-1:0]};
+    end
+   end
+
+  // we need async fifo to keep to clocks one for the tpu and other for the input stream
+  async_fifo
+    #(
+      DSIZE,
+      ASIZE
+    )
+    fifo
+    (
+      wclk,
+      wrst_n,
+      winc,
+      wdata,
+      wfull,
+      awfull,
+      rclk,
+      rrst_n,
+      rinc,
+      rdata,
+      rempty,
+      arempty
+    );
+
 
 
 endmodule

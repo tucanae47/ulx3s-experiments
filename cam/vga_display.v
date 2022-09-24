@@ -48,7 +48,6 @@ module vga_display
     input          hsync,
     input          vsync,
     input          rgbmode,
-    input          testmode,
     input [10-1:0] col,
     input [10-1:0] row,
     input  [c_nb_buf-1:0] frame_pixel,
@@ -64,7 +63,6 @@ module vga_display
   wire [2:0] char_row;
   wire [2:0] char_col;
   wire [3:0] addr_rom_rgb;
-  wire [3:0] addr_rom_test;
 
   reg [4-1:0] vga_red_wr;
   reg [4-1:0] vga_green_wr;
@@ -80,7 +78,6 @@ module vga_display
   assign char_row = row[2:0];
   assign char_col = col[2:0];
   assign addr_rom_rgb = {~rgbmode, char_row};
-  assign addr_rom_test = {testmode, char_row};
 
   always @ (addr_rom_rgb) begin
     case (addr_rom_rgb)
@@ -103,26 +100,6 @@ module vga_display
     endcase
   end
 
-  always @ (addr_rom_test) begin
-    case (addr_rom_test)
-      4'h0: char_testmode <= 8'b10000010; // N: Normal
-      4'h1: char_testmode <= 8'b11000010;
-      4'h2: char_testmode <= 8'b10100010;
-      4'h3: char_testmode <= 8'b10010010;
-      4'h4: char_testmode <= 8'b10001010;
-      4'h5: char_testmode <= 8'b10000110;
-      4'h6: char_testmode <= 8'b10000010;
-      4'h7: char_testmode <= 8'b00000000;
-      4'h8: char_testmode <= 8'b11111110; // T: Test
-      4'h9: char_testmode <= 8'b00010000;
-      4'hA: char_testmode <= 8'b00010000;
-      4'hB: char_testmode <= 8'b00010000;
-      4'hC: char_testmode <= 8'b00010000;
-      4'hD: char_testmode <= 8'b00010000;
-      4'hE: char_testmode <= 8'b00010000;
-      4'hF: char_testmode <= 8'b00000000;
-    endcase
-  end
 
 
   always @ (posedge rst, posedge clk)
@@ -150,13 +127,6 @@ module vga_display
     vga_green_wr = {4{1'b0}};
     vga_blue_wr  = {4{1'b0}};
     if (col < 256) begin
-        //if ((col < c_img_cols) && (row < c_img_rows)) begin
-        //   // frame, not painting here
-        //  vga_red_wr   = {4{1'b0}};
-        //  vga_green_wr = {4{1'b0}};
-        //  vga_blue_wr  = {4{1'b0}};
-        //end
-        //else if (row > 240 && row < 256) begin
       if (row < 256) begin
         if ((row >= 128) && (row < 128 + 8)) begin
           if ((col > 7) && (col < 16)) begin // RGB MODE
@@ -166,29 +136,7 @@ module vga_display
               vga_blue_wr  = 4'b1111;
             end
           end
-          else if ((col > 15) && (col < 24)) begin // TEST MODE
-            if (char_testmode[7-char_col]) begin
-              vga_red_wr   = 4'b1111;
-              vga_green_wr = 4'b1111;
-              vga_blue_wr  = 4'b1111;
-            end
-          end
         end
-        //else if ((col == c_img_cols) || (row == c_img_rows)) begin
-        //   vga_red_wr   = 4'b0000;
-        //   vga_green_wr = 4'b1000;
-        //   vga_blue_wr  = 4'b1000;
-        //end
-        //else if ((col == 2*c_img_cols) || (row == 2*c_img_rows)) begin
-        //   vga_red_wr   = 4'b1000;
-        //   vga_green_wr = 4'b1000;
-        //   vga_blue_wr  = 4'b0000;
-        //end
-        //else if ((col == 4*c_img_cols) || (row == 4*c_img_rows)) begin
-        //   vga_red_wr   = 4'b1000;
-        //   vga_green_wr = 4'b0000;
-        //   vga_blue_wr  = 4'b1000;
-        //end
         else if (row > 240) begin
           if (col < 64) begin
             // Test grayscale  square of 16 pixels

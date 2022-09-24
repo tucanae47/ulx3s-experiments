@@ -3,16 +3,16 @@
 // LICENSE=BSD
 
 module oled_video
-#(
+#( parameter
   // file name is relative to directory path in which verilog compiler is running
   // screen can be also XY flipped and/or rotated from this init file
-  parameter c_init_file = "ssd1351_oinit_xflip_16bit.mem",
-  parameter c_init_size = 44, // bytes in init file
-  parameter c_color_bits = 16, // 8 or 16 color depth (should match init file)
-  parameter c_x_size = 128,  // pixel X screen size (don't touch)
-  parameter c_y_size = 128,  // pixel Y screen size (don't touch)
-  parameter c_x_bits = $clog2(c_x_size), // 96->7, fits X screen size (don't touch)
-  parameter c_y_bits = $clog2(c_y_size)  // 64->6, fits X screen size (don't touch)
+  c_init_file = "ssd1351_oinit_xflip_16bit.mem",
+  c_init_size = 44, // bytes in init file
+  c_color_bits = 16, // 8 or 16 color depth (should match init file)
+  c_x_size = 128,  // pixel X screen size (don't touch)
+  c_y_size = 128,  // pixel Y screen size (don't touch)
+  c_x_bits = $clog2(c_x_size), // 96->7, fits X screen size (don't touch)
+  c_y_bits = $clog2(c_y_size)  // 64->6, fits X screen size (don't touch)
 )
 (
   input  wire clk, // SPI display clock rate will be half of this clock rate

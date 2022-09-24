@@ -30,11 +30,11 @@ module top_ov7670
       // c_img_pxls    = c_img_cols * c_img_rows,
       // c_nb_line_pxls = 9, // log2i(c_img_cols-1) + 1;
       // c_nb_img_pxls =  17,  //320*240=76,800 -> 2^17
-      c_img_cols    = 160, // 8 bits
-      c_img_rows    = 120, //  7 bits
-      c_nb_line_pxls = 8, // log2i(c_img_cols-1) + 1;
-      c_img_pxls    = c_img_cols * c_img_rows,
-      c_nb_img_pxls =  15,  //160*120=19.200 -> 2^15
+      // c_img_cols    = 160, // 8 bits
+      // c_img_rows    = 120, //  7 bits
+      // c_nb_line_pxls = 8, // log2i(c_img_cols-1) + 1;
+      // c_img_pxls    = c_img_cols * c_img_rows,
+      // c_nb_img_pxls =  15,  //160*120=19.200 -> 2^15
       // QQVGA
       // c_img_cols    = 120, // 8 bits
       // c_img_rows    = 90, //  7 bits
@@ -42,10 +42,11 @@ module top_ov7670
       // c_img_pxls    = c_img_cols * c_img_rows,
       // c_nb_img_pxls =  14,  //160*120=19.200 -> 2^15
       // QQVGA /2
-      //c_img_cols    = 80, // 7 bits
-      //c_img_rows    = 60, //  6 bits
-      //c_img_pxls    = c_img_cols * c_img_rows,
-      //c_nb_img_pxls =  13,  //80*60=4800 -> 2^13
+      c_nb_line_pxls = 7, // log2i(c_img_cols-1) + 1;
+      c_img_cols    = 80, // 7 bits
+      c_img_rows    = 60, //  6 bits
+      c_img_pxls    = c_img_cols * c_img_rows,
+      c_nb_img_pxls =  13,  //80*60=4800 -> 2^13
 
        c_nb_buf_red   =  4,  // n bits for red in the buffer (memory)
        c_nb_buf_green =  4,  // n bits for green in the buffer (memory)
@@ -280,8 +281,8 @@ module top_ov7670
     oled_video
     #(
         .c_init_file("ssd1351_oinit_xflip_16bit.mem"),
-        .c_x_size(128),
-        .c_y_size(128),
+        .c_x_size(80),
+        .c_y_size(60),
         .c_color_bits(C_color_bits)
     )
     oled_video_inst

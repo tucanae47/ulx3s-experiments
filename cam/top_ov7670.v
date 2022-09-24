@@ -25,16 +25,16 @@ module top_ov7670
       // c_nb_img_pxls = log2i(c_img_pxls-1) + 1
       //c_nb_img_pxls =  19,  //640*480=307,200 -> 2^19=524,288
       // QVGA
-      c_img_cols    = 320, // 9 bits
-      c_img_rows    = 240, // 8 bits
-      c_img_pxls    = c_img_cols * c_img_rows,
-      c_nb_line_pxls = 9, // log2i(c_img_cols-1) + 1;
-      c_nb_img_pxls =  17,  //320*240=76,800 -> 2^17
-      // c_img_cols    = 160, // 8 bits
-      // c_img_rows    = 120, //  7 bits
-      // c_nb_line_pxls = 8, // log2i(c_img_cols-1) + 1;
+      // c_img_cols    = 320, // 9 bits
+      // c_img_rows    = 240, // 8 bits
       // c_img_pxls    = c_img_cols * c_img_rows,
-      // c_nb_img_pxls =  15,  //160*120=19.200 -> 2^15
+      // c_nb_line_pxls = 9, // log2i(c_img_cols-1) + 1;
+      // c_nb_img_pxls =  17,  //320*240=76,800 -> 2^17
+      c_img_cols    = 160, // 8 bits
+      c_img_rows    = 120, //  7 bits
+      c_nb_line_pxls = 8, // log2i(c_img_cols-1) + 1;
+      c_img_pxls    = c_img_cols * c_img_rows,
+      c_nb_img_pxls =  15,  //160*120=19.200 -> 2^15
       // QQVGA
       // c_img_cols    = 120, // 8 bits
       // c_img_rows    = 90, //  7 bits

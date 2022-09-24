@@ -307,12 +307,14 @@ module ov7670_ctrl_reg
 
       // -- QVGA 320x240
       6'h32:
-        reg_rgb444_test <= 16'h0C04; // 0C: COM3 Common Control 3
+        // reg_rgb444_test <= 16'h0C04; // 0C: COM3 Common Control 3
+        reg_rgb444_test <= 16'h0C0C; // 0C: COM3 Common Control 3
                              // [3]=1: Enable scale (for QQVGA/2)
                              // [2]=0: Disable DCW
                              // others default
       6'h33:
-        reg_rgb444_test <= 16'h3E19; // 3E: COM14 Common Control 14
+        reg_rgb444_test <= 16'h3E1A; // 3E: COM14 Common Control 14
+        // reg_rgb444_test <= 16'h3E19; // 3E: COM14 Common Control 14
                              //    Scaling can be adjusted manually
                              // [7:5]: Reserved
                              // [4]=1: Scaling PCLK and DCW enabled
@@ -350,7 +352,10 @@ module ov7670_ctrl_reg
                              // [1:0]: Horztal down sampling rate
                              // [1:0]=01: Horztal down sampling by 2->QVGA
       6'h37:
-        reg_rgb444_test <= 16'h73F1; // 73: SCALING_PCLK_DIV
+        reg_rgb444_test <= 16'h73F2; // 73: SCALING_PCLK_DIV
+        // reg_rgb444_test <= 16'h73F1; // 73: SCALING_PCLK_DIV
+        // reg_rgb444_test <= 16'h73FA; // 73: SCALING_PCLK_DIV
+        // reg_rgb444_test <= 16'h73FB; // 73: SCALING_PCLK_DIV
                              // [7:4]=F: Reserved, and manual says default is 0
                              //          but IG says F
                              // [3]=0: Enable clk divider for DSP scale control
@@ -583,12 +588,13 @@ module ov7670_ctrl_reg
 
       // -- QVGA 320x240
       6'h32:
-        reg_rgb444 <= 16'h0C04; // 0C: COM3 Common Control 3
+        // reg_rgb444 <= 16'h0C04; // 0C: COM3 Common Control 3
+        reg_rgb444 <= 16'h0C0C; // 0C: COM3 Common Control 3
                              // [3]=1: Enable scale (for QQVGA/2)
                              // [2]=0: Disable DCW
                              // others default
       6'h33:
-        reg_rgb444 <= 16'h3E19; // 3E: COM14 Common Control 14
+        reg_rgb444 <= 16'h3E1A; // 3E: COM14 Common Control 14
                              //    Scaling can be adjusted manually
                              // [7:5]: Reserved
                              // [4]=1: Scaling PCLK and DCW enabled
@@ -626,7 +632,8 @@ module ov7670_ctrl_reg
                              // [1:0]: Horztal down sampling rate
                              // [1:0]=01: Horztal down sampling by 2->QVGA
       6'h37:
-        reg_rgb444 <= 16'h73F1; // 73: SCALING_PCLK_DIV
+        reg_rgb444 <= 16'h73F2; // 73: SCALING_PCLK_DIV
+        // reg_rgb444 <= 16'h73FA; // 73: SCALING_PCLK_DIV
                              // [7:4]=F: Reserved, and manual says default is 0
                              //          but IG says F
                              // [3]=0: Enable clk divider for DSP scale control
@@ -773,12 +780,14 @@ module ov7670_ctrl_reg
 
       // -- QVGA 320x240
       6'h11:
-        reg_yuv422_test <= 16'h0C04; // 0C: COM3 Common Control 3
+        // reg_yuv422_test <= 16'h0C04; // 0C: COM3 Common Control 3
+        reg_yuv422_test <= 16'h0C0C; // 0C: COM3 Common Control 3
                              // [3]=1: Enable scale (for QQVGA/2)
                              // [2]=0: Disable DCW
                              // others default
       6'h12:
-        reg_yuv422_test <= 16'h3E19; // 3E: COM14 Common Control 14
+        // reg_yuv422_test <= 16'h3E19; // 3E: COM14 Common Control 14
+        reg_yuv422_test <= 16'h3E1A; // 3E: COM14 Common Control 14
                              //    Scaling can be adjusted manually
                              // [7:5]: Reserved
                              // [4]=1: Scaling PCLK and DCW enabled
@@ -816,7 +825,8 @@ module ov7670_ctrl_reg
                              // [1:0]: Horztal down sampling rate
                              // [1:0]=01: Horztal down sampling by 2->QVGA
       6'h16:
-        reg_yuv422_test <= 16'h73F1; // 73: SCALING_PCLK_DIV
+        // reg_yuv422_test <= 16'h73FA; // 73: SCALING_PCLK_DIV
+        reg_yuv422_test <= 16'h73F2; // 73: SCALING_PCLK_DIV
                              // [7:4]=F: Reserved, and manual says default is 0
                              //          but IG says F
                              // [3]=0: Enable clk divider for DSP scale control
@@ -960,12 +970,14 @@ module ov7670_ctrl_reg
 
       // -- QVGA
       6'h11:
-        reg_yuv422 <= 16'h0C04; // 0C: COM3 Common Control 3
+        // reg_yuv422 <= 16'h0C04; // 0C: COM3 Common Control 3
+        reg_yuv422 <= 16'h0C0C; // 0C: COM3 Common Control 3
                              // [3]=1: Enable scale (for QQVGA/2)
                              // [2]=0: Disable DCW
                              // others default
       6'h12:
-        reg_yuv422 <= 16'h3E19; // 3E: COM14 Common Control 14
+        // reg_yuv422 <= 16'h3E19; // 3E: COM14 Common Control 14
+        reg_yuv422 <= 16'h3E1A; // 3E: COM14 Common Control 14
                              //    Scaling can be adjusted manually
                              // [7:5]: Reserved
                              // [4]=1: Scaling PCLK and DCW enabled
@@ -1003,7 +1015,9 @@ module ov7670_ctrl_reg
                              // [1:0]: Horztal down sampling rate
                              // [1:0]=01: Horztal down sampling by 2->QVGA
       6'h16:
-        reg_yuv422 <= 16'h73F1; // 73: SCALING_PCLK_DIV
+        // reg_yuv422 <= 16'h73FA; // 73: SCALING_PCLK_DIV
+        // reg_yuv422 <= 16'h73F1; // 73: SCALING_PCLK_DIV
+        reg_yuv422 <= 16'h73F2; // 73: SCALING_PCLK_DIV
                              // [7:4]=F: Reserved, and manual says default is 0
                              //          but IG says F
                              // [3]=0: Enable clk divider for DSP scale control

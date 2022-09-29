@@ -38,7 +38,7 @@ async def test_pixels(dut):
 
     await RST(dut)
 
-    await ClockCycles(dut.clk, 60000)
+    await ClockCycles(dut.clk, 120000)
 
 
       

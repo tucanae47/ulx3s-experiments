@@ -1,6 +1,6 @@
 /* 
-    author : @mkvenkit
-    https://github.com/mkvenkit/learn_fpga
+    author : @tucanae47 mod from @mkvenkit
+    modifed from https://github.com/mkvenkit/learn_fpga
     bram_buffer.v
 
     This module implements a 128 x 128 x 16-bit buffer using BRAM.

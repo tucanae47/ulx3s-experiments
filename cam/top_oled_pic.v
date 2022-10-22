@@ -43,8 +43,8 @@ wire next_pixel;
 oled_video
     #(
       .c_init_file("ssd1351_linit_xflip_16bit.mem"),
-      .c_x_size(80),
-      .c_y_size(60),
+      .c_x_size(128),
+      .c_y_size(128),
       .c_color_bits(16)
     )
     oled_video_inst

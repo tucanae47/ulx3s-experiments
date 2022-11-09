@@ -2,7 +2,7 @@ PROJ=bram_oled
 
 all: $(PROJ).bit
 
-$(PROJ).json: top.v oled_video.v bram_buffer.v
+$(PROJ).json: top.v oled_video.v bram_buffer.v gen_pos.v
 	yosys -p "synth_ecp5 -top top -json $@" $^
 
 $(PROJ)_out.config: $(PROJ).json

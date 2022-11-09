@@ -51,27 +51,27 @@ wire [5:0] b;
 
 // wire [11:0] rgb;
 
-// bram_buffer buf_rgb (
-//     .clk(clk),
-//     // .reset(~btn0),
-//     .reset(rst),
-//     .row(x),
-//     .col(y),
-//     .oe(1'd1),
-//     .r(r),
-//     .g(g),
-//     .b(b)
-// );
+bram_buffer buf_rgb (
+    .clk(clk),
+    .reset(~btn0),
+    // .reset(rst),
+    .row(x),
+    .col(y),
+    .oe(1'd1),
+    .r(r),
+    .g(g),
+    .b(b)
+);
 
 
 
-   wire [15:0] color = x[3] ^ y[3] ? {5'd0, x[6:1], 5'd0} : {y[5:1], 6'd0, 5'd0};
+  //  wire [15:0] color = x[3] ^ y[3] ? {5'd0, x[6:1], 5'd0} : {y[5:1], 6'd0, 5'd0};
 // wire [15:0] color = (next_pixel)?{b,g,r}: 16'd0;
 oled_video
     #(
       // .c_init_file("ssd1351_oinit.mem"),
       // .c_init_file("ssd1351.mem"),
-      .c_init_file("ssd1351_linit_xflip_16bit.mem"),
+      // .c_init_file("ssd1351_linit_xflip_16bit.mem"),
       .c_x_size(128),
       .c_y_size(128),
       .c_color_bits(16)
@@ -79,8 +79,8 @@ oled_video
     oled_video_inst
     (
       .clk(clk),
-      // .reset(~btn0),
-      .reset(rst),
+      .reset(~btn0),
+      // .reset(rst),
       .next_pixel(next_pixel),
       .x(x),
       .y(y),
@@ -135,6 +135,7 @@ oled_video
 // assign color = (next_pixel)?{b,g,r}: 16'd0;
 // wire [15:0] color = (next_pixel)?{r,g,b}: 16'd0;
 // wire [15:0] color = (next_pixel)?{b,g,r}: 16'd0;
-// wire [15:0] color = {b,g,r};
+    // Next pixel is not working
+wire [15:0] color = {b,g,r};
 endmodule
 

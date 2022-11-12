@@ -5,7 +5,7 @@ module top
      // VGA
      c_nb_line_pxls = 7, // log2i(c_img_cols-1) + 1;
      c_img_cols    = 80, // 7 bits
-     c_img_rows    = 80, //  6 bits
+     c_img_rows    = 60, //  6 bits
      c_img_pxls    = c_img_cols * c_img_rows,
      c_nb_img_pxls =  13,  //80*60=4800 -> 2^13
 

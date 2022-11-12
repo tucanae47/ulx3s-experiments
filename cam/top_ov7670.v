@@ -51,7 +51,8 @@ module top_ov7670
     );
 
 
-  reg  winc, wclk, oclk;
+  // reg  winc, wclk, oclk;
+  reg  oclk;
   // rclk;
   reg  [DSIZE-1:0] wdata;
   reg              wrst_n;
@@ -102,14 +103,14 @@ module top_ov7670
   wire          locked_wire;
   parameter     swap_r_b = 1'b1; // red and blue are swapped
 
-  wire clk = clk25mhz;
-  // 50 MHz clock
-  pll i_pll
-      (
-        .clkin(clk25mhz),
-        .clkout0(clk50mhz),
-        .locked(locked_wire)
-      );
+  // wire clk = clk25mhz;
+  // // 50 MHz clock
+  // pll i_pll
+  //     (
+  //       .clkin(clk25mhz),
+  //       .clkout0(clk50mhz),
+  //       .locked(locked_wire)
+  //     );
 
 
 
@@ -188,31 +189,31 @@ module top_ov7670
 
   reg end_img;
 
-  always @(posedge wclk)
-  begin
-    if (vga_row == c_img_rows -1 && vga_col == c_img_cols - 1)
-      end_img<= 1;
-    else
-      end_img<= 0;
-  end
-  reg [7:0] img, img_g;
-  localparam N = 8;
+  // always @(posedge oclk)
+  // begin
+  //   if (vga_row == c_img_rows -1 && vga_col == c_img_cols - 1)
+  //     end_img<= 1;
+  //   else
+  //     end_img<= 0;
+  // end
+  // reg [7:0] img, img_g;
+  // localparam N = 8;
 
-  always @(posedge end_img)
-  begin
-    if(rst)
-    begin
-      img<=0;
-      img_g<=0;
-    end
-    else
-    begin
-      img <= img + 1;
-      img_g <= {img[N-1], img[N-1:1] ^ img[N-2:0]};
-    end
-    // img <= img ^ img[7:1];
-  end
-  assign led[5:0] = img_g[5:0];
+  // always @(posedge end_img)
+  // begin
+  //   if(rst)
+  //   begin
+  //     img<=0;
+  //     img_g<=0;
+  //   end
+  //   else
+  //   begin
+  //     img <= img + 1;
+  //     img_g <= {img[N-1], img[N-1:1] ^ img[N-2:0]};
+  //   end
+  //   // img <= img ^ img[7:1];
+  // end
+  // assign led[5:0] = img_g[5:0];
   assign led[7] = config_finished;
   assign led[6] = enable_oled;
   wire enable_oled;
@@ -249,6 +250,7 @@ module top_ov7670
                     .rst          (rst),
                     .clk          (oclk),
                     .resend       (resend),
+                    .cnt_reg_test (led[5:0]),
                     .rgbmode      (rgbmode),
                     // .cnt_reg_test (led[5:0]),
                     .testmode     (testmode),
@@ -271,35 +273,38 @@ module top_ov7670
   localparam ASIZE = c_img_pxls;
 
   wire [6:0] x;
-  wire [5:0] y;
+  wire [6:0] y;
 
   reg [4:0] r= {5{1'b0}};
   reg [4:0] g= {5{1'b0}};
   reg [5:0] b= {6{1'b0}};
-
-  reg [4:0] r2= {5{1'b0}};
-  reg [4:0] g2= {5{1'b0}};
-  reg [5:0] b2= {6{1'b0}};
+  // wire [4:0] r2;
+  // wire [4:0] g2;
+  // wire [5:0] b2;
+  // reg [4:0] r2= {5{1'b0}};
+  // reg [4:0] g2= {5{1'b0}};
+  // reg [5:0] b2= {6{1'b0}};
   wire next_pixel;
   wire oclk;
 
-  bram_buffer buf_rgb (
-                .clk(oclk),
-                .reset(~btn0),
-                // .reset(rst),
-                .row(x),
-                .col(y),
-                .oe(1'd1),
-                .r(r2),
-                .g(g2),
-                .b(b2)
-              );
+  // bram_buffer buf_rgb (
+  //               .clk(oclk),
+  //               .reset(~btn0),
+  //               // .reset(rst),
+  //               .row(x),
+  //               .col(y),
+  //               .oe(1'd1),
+  //               .r(r2),
+  //               .g(g2),
+  //               .b(b2)
+  //             );
   // wire [15:0] color = {r, g, b};
   oled_video
     oled_video_inst
     (
       .clk(oclk),
-      .reset(~btn0),
+      .reset(rst),
+      // .reset(~btn0),
       // .reset(enable_oled),
       // .reset(~capture_wen),
       .next_pixel(next_pixel),
@@ -316,22 +321,33 @@ module top_ov7670
   assign wclk = clk50mhz;
   assign oclk = clk25mhz;
   reg [15:0] color;
+
+  // wire [15:0] color = {r,g,b};
   always @(posedge oclk)
   begin
-    if (x < c_img_rows)
-    begin
-      if (y < c_img_cols)
-      begin
-        r  <= orig_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
-        g  <= orig_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
-        b  <= orig_img_pxl[c_nb_buf_blue-1:0];
-        color<= {r,g,b};
-      end
+    if (rst) begin
+      orig_img_addr <= 0;
     end
     else
     begin
-      color<= {r2,g2,b2};
-      // color<={5'd0, x[6:1], 5'd0};
+      if (x < c_img_rows) begin
+        if (y < c_img_cols) begin
+          r  <= orig_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
+          g  <= orig_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
+          b  <= orig_img_pxl[c_nb_buf_blue-1:0];
+          orig_img_addr <= orig_img_addr + 1;
+          color<= {r,g,b};
+          // color<={5'd0, x[6:1], 5'd0};
+        end
+      end
+      else begin
+        orig_img_addr <= 0;
+        // color<={5'd0, x[6:1], 5'd0};
+        // {r,g,b}<={5'd0, x[6:1], 5'd0};
+
+        color<={5'd12, 5'd134, 6'd0};
+        // color<= {r2,g2,b2};
+      end
     end
   end
 

@@ -13,10 +13,12 @@ module oled_video
      // c_init_size = 59, // bytes in init file
      c_init_size = 44, // bytes in init file
      c_color_bits = 16, // 8 or 16 color depth (should match init file)
-     c_x_size = 80,  // pixel X screen size (don't touch)
-     c_y_size = 60,  // pixel Y screen size (don't touch)
-     c_x_bits = $clog2(c_x_size), // 96->7, fits X screen size (don't touch)
-     c_y_bits = $clog2(c_y_size)  // 64->6, fits X screen size (don't touch)
+     c_x_size = 128,  // pixel X screen size (don't touch)
+     c_y_size = 128,  // pixel Y screen size (don't touch)
+     c_x_bits = 7, // 96->7, fits X screen size (don't touch)
+    //  c_x_bits = $clog2(c_x_size), // 96->7, fits X screen size (don't touch)
+     c_y_bits = 7  // 64->6, fits X screen size (don't touch)
+    //  c_y_bits = $clog2(c_y_size)  // 64->6, fits X screen size (don't touch)
    )
    (
      input  wire clk, // SPI display clock rate will be half of this clock rate

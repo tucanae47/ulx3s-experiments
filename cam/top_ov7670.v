@@ -113,48 +113,48 @@ module top_ov7670
 
 
 
-  // vga_sync i_vga
-  //          (
-  //            .rst     (rst),
-  //            .clk     (wclk),
-  //            .visible (vga_visible),
-  //            .new_pxl (vga_new_pxl),
-  //            .hsync   (vga_hsync_wr),
-  //            .vsync   (vga_vsync_wr),
-  //            .col     (vga_col),
-  //            .row     (vga_row)
-  //            //  .end_img (end_img)
-  //          );
+  vga_sync i_vga
+           (
+             .rst     (rst),
+             .clk     (wclk),
+             .visible (vga_visible),
+             .new_pxl (vga_new_pxl),
+             .hsync   (vga_hsync_wr),
+             .vsync   (vga_vsync_wr),
+             .col     (vga_col),
+             .row     (vga_row)
+             //  .end_img (end_img)
+           );
 
-  // // localparam c_line_total = 80 * 60;
-  // localparam c_line_total = 520;
+  // localparam c_line_total = 80 * 60;
+  localparam c_line_total = 520;
 
-  // vga_display
-  //   # (
-  //     .c_img_cols(c_img_cols), // 7 bits
-  //     .c_img_rows(c_img_rows), //  6 bits
-  //     .c_img_pxls(c_img_cols * c_img_rows),
-  //     .c_nb_img_pxls(c_nb_img_pxls)
-  //   )
-  //   I_ov_display
-  //   (
-  //     .rst        (rst),
-  //     .clk        (wclk),
-  //     .visible    (vga_visible),
-  //     .new_pxl    (vga_new_pxl),
-  //     .hsync      (vga_hsync_wr),
-  //     .vsync      (vga_vsync_wr),
-  //     .rgbmode    (rgbmode),
-  //     .col        (vga_col),
-  //     .row        (vga_row),
-  //     .frame_pixel(orig_img_pxl),
-  //     .frame_addr (orig_img_addr),
-  //     .hsync_out  (vga_hsync),
-  //     .vsync_out  (vga_vsync),
-  //     .vga_red    (vga_red),
-  //     .vga_green  (vga_green),
-  //     .vga_blue   (vga_blue)
-  //   );
+  vga_display
+    # (
+      .c_img_cols(c_img_cols), // 7 bits
+      .c_img_rows(c_img_rows), //  6 bits
+      .c_img_pxls(c_img_cols * c_img_rows),
+      .c_nb_img_pxls(c_nb_img_pxls)
+    )
+    I_ov_display
+    (
+      .rst        (rst),
+      .clk        (wclk),
+      .visible    (vga_visible),
+      .new_pxl    (vga_new_pxl),
+      .hsync      (vga_hsync_wr),
+      .vsync      (vga_vsync_wr),
+      .rgbmode    (rgbmode),
+      .col        (vga_col),
+      .row        (vga_row),
+      .frame_pixel(orig_img_pxl),
+      .frame_addr (orig_img_addr),
+      .hsync_out  (vga_hsync),
+      .vsync_out  (vga_vsync),
+      .vga_red    (vga_red),
+      .vga_green  (vga_green),
+      .vga_blue   (vga_blue)
+    );
   // count 2 clock cycles to get a pixel cycle
   reg  [10-1:0]  cntO_pxl;
   reg  [10-1:0]  cntO_line;

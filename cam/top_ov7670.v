@@ -117,7 +117,7 @@ module top_ov7670
   vga_sync i_vga
            (
              .rst     (rst),
-             .clk     (oclk),
+             .clk     (wclk),
              .visible (vga_visible),
              .new_pxl (vga_new_pxl),
              .hsync   (vga_hsync_wr),
@@ -152,7 +152,7 @@ module top_ov7670
     I_ov_display
     (
       .rst        (rst),
-      .clk        (oclk),
+      .clk        (wclk),
       .visible    (vga_visible),
       .new_pxl    (vga_new_pxl),
       .hsync      (vga_hsync_wr),
@@ -257,7 +257,7 @@ module top_ov7670
     )
     cam_fb
     (
-      .clk     (oclk),
+      .clk     (wclk),
       .wea     (capture_wen),
       .addra   (capture_addr),
       .dina    (capture_data),
@@ -316,7 +316,7 @@ module top_ov7670
   // assign color = {img[5:0] ^ img[6:1],img[7:3] ^ img[4:0], img[7:2] ^ img[5:0]};
 
   // wire [15:0] color = img[5:0] ^ img[6:1] ? {5'd0, img[6:1], 5'd0} : {img[5:1], 6'd0, 5'd0};
-  always @(posedge oclk) begin
+  always @(posedge wclk) begin
   if (vga_row == c_img_rows -1 && vga_col == c_img_cols - 1) 
       end_img<= 1;
     else
@@ -435,7 +435,8 @@ module top_ov7670
     oled_video_inst
     (
       .clk(oclk),
-      .reset(enable_oled),
+      .reset(~btn0),
+      // .reset(enable_oled),
       // .reset(~capture_wen),
       .next_pixel(next_pixel),
       .x(x),
@@ -453,7 +454,7 @@ module top_ov7670
   // assign g = orig_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
   // assign b = orig_img_pxl[c_nb_buf_blue-1:0];
 
-  // assign wclk = clk50mhz;
+  assign wclk = clk50mhz;
   // assign wclk = clk25mhz;
   assign oclk = clk25mhz;
   // //   assign rrst_n = btn0;

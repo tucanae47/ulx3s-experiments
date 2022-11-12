@@ -99,7 +99,6 @@ module top_ov7670
   wire          clk50mhz;
 
   wire          rgbmode = 1'b1;
-  wire          testmode;
   wire          locked_wire;
   parameter     swap_r_b = 1'b1; // red and blue are swapped
 
@@ -114,48 +113,48 @@ module top_ov7670
 
 
 
-  vga_sync i_vga
-           (
-             .rst     (rst),
-             .clk     (wclk),
-             .visible (vga_visible),
-             .new_pxl (vga_new_pxl),
-             .hsync   (vga_hsync_wr),
-             .vsync   (vga_vsync_wr),
-             .col     (vga_col),
-             .row     (vga_row)
-             //  .end_img (end_img)
-           );
+  // vga_sync i_vga
+  //          (
+  //            .rst     (rst),
+  //            .clk     (wclk),
+  //            .visible (vga_visible),
+  //            .new_pxl (vga_new_pxl),
+  //            .hsync   (vga_hsync_wr),
+  //            .vsync   (vga_vsync_wr),
+  //            .col     (vga_col),
+  //            .row     (vga_row)
+  //            //  .end_img (end_img)
+  //          );
 
-  // localparam c_line_total = 80 * 60;
-  localparam c_line_total = 520;
+  // // localparam c_line_total = 80 * 60;
+  // localparam c_line_total = 520;
 
-  vga_display
-    # (
-      .c_img_cols(c_img_cols), // 7 bits
-      .c_img_rows(c_img_rows), //  6 bits
-      .c_img_pxls(c_img_cols * c_img_rows),
-      .c_nb_img_pxls(c_nb_img_pxls)
-    )
-    I_ov_display
-    (
-      .rst        (rst),
-      .clk        (wclk),
-      .visible    (vga_visible),
-      .new_pxl    (vga_new_pxl),
-      .hsync      (vga_hsync_wr),
-      .vsync      (vga_vsync_wr),
-      .rgbmode    (rgbmode),
-      .col        (vga_col),
-      .row        (vga_row),
-      .frame_pixel(orig_img_pxl),
-      .frame_addr (orig_img_addr),
-      .hsync_out  (vga_hsync),
-      .vsync_out  (vga_vsync),
-      .vga_red    (vga_red),
-      .vga_green  (vga_green),
-      .vga_blue   (vga_blue)
-    );
+  // vga_display
+  //   # (
+  //     .c_img_cols(c_img_cols), // 7 bits
+  //     .c_img_rows(c_img_rows), //  6 bits
+  //     .c_img_pxls(c_img_cols * c_img_rows),
+  //     .c_nb_img_pxls(c_nb_img_pxls)
+  //   )
+  //   I_ov_display
+  //   (
+  //     .rst        (rst),
+  //     .clk        (wclk),
+  //     .visible    (vga_visible),
+  //     .new_pxl    (vga_new_pxl),
+  //     .hsync      (vga_hsync_wr),
+  //     .vsync      (vga_vsync_wr),
+  //     .rgbmode    (rgbmode),
+  //     .col        (vga_col),
+  //     .row        (vga_row),
+  //     .frame_pixel(orig_img_pxl),
+  //     .frame_addr (orig_img_addr),
+  //     .hsync_out  (vga_hsync),
+  //     .vsync_out  (vga_vsync),
+  //     .vga_red    (vga_red),
+  //     .vga_green  (vga_green),
+  //     .vga_blue   (vga_blue)
+  //   );
   // count 2 clock cycles to get a pixel cycle
   reg  [10-1:0]  cntO_pxl;
   reg  [10-1:0]  cntO_line;
@@ -175,7 +174,7 @@ module top_ov7670
     )
     cam_fb
     (
-      .clk     (wclk),
+      .clk     (oclk),
       .wea     (capture_wen),
       .addra   (capture_addr),
       .dina    (capture_data),
@@ -189,8 +188,9 @@ module top_ov7670
 
   reg end_img;
 
-  always @(posedge wclk) begin
-  if (vga_row == c_img_rows -1 && vga_col == c_img_cols - 1) 
+  always @(posedge wclk)
+  begin
+    if (vga_row == c_img_rows -1 && vga_col == c_img_cols - 1)
       end_img<= 1;
     else
       end_img<= 0;
@@ -200,20 +200,25 @@ module top_ov7670
 
   always @(posedge end_img)
   begin
-    if(rst)begin
+    if(rst)
+    begin
       img<=0;
       img_g<=0;
     end
-    else begin
+    else
+    begin
       img <= img + 1;
       img_g <= {img[N-1], img[N-1:1] ^ img[N-2:0]};
     end
-      // img <= img ^ img[7:1]; 
+    // img <= img ^ img[7:1];
   end
   assign led[5:0] = img_g[5:0];
-  // assign capture_wen = (btnd==1'b0 && ~enr) ? capture_we : 1'b0;
-  // assign capture_wen = (img < 10 && btnd==1'b0) ? capture_we : 1'b0;
-  assign capture_wen = (~enable_oled && btnd==1'b0 ) ? capture_we : 1'b0;
+  assign led[7] = config_finished;
+  assign led[6] = enable_oled;
+  wire enable_oled;
+  // assign enable_oled = (img_g>8'd254) ? 1'b1 : 1'b0;
+  assign enable_oled = (img>8'd254) ? 1'b1 : 1'b0;
+  assign capture_wen = (~enable_oled) ? capture_we : 1'b0;
 
   ov7670_capture
     # (
@@ -259,16 +264,6 @@ module top_ov7670
   assign resend = 1'b0;
   assign ov7670_siod = sdat_on ? sdat_out : 1'bz;
 
-  assign led[7] = config_finished;
-//  always @(posedge wclk) begin
-  
-  // assign led[7:5] = vga_row[8:6];
-      // led[7:5] <= vga_row[8:6];
-//  end
-  // assign led[6] = btnd;
-
-  // assign led[7] = img;
-  // assign led[6] = btnd;
 
   parameter C_color_bits = 16; // 8 or 16
 
@@ -283,18 +278,20 @@ module top_ov7670
   reg [5:0] b= {6{1'b0}};
   wire next_pixel;
   wire oclk;
-  wire enable_oled; 
-    
-  assign enable_oled = (img_g>8'd254) ? 1'b1 : 1'b0;
 
+  bram_buffer buf_rgb (
+                .clk(oclk),
+                .reset(~btn0),
+                // .reset(rst),
+                .row(x),
+                .col(y),
+                .oe(1'd1),
+                .r(r),
+                .g(g),
+                .b(b)
+              );
   // wire [15:0] color = {r, g, b};
   oled_video
-    #(
-      // .c_init_file("ssd1351_oinit_xflip_16bit.mem"),
-      .c_x_size(80),
-      .c_y_size(60),
-      .c_color_bits(C_color_bits)
-    )
     oled_video_inst
     (
       .clk(oclk),
@@ -314,12 +311,23 @@ module top_ov7670
 
   assign wclk = clk50mhz;
   assign oclk = clk25mhz;
-  wire [15:0] color = {r,g,b};
+  reg [15:0] color;
   always @(posedge oclk)
   begin
+    if (x < c_img_rows)
+    begin
+      if (y < c_img_cols)
+      begin
         r  <= orig_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
         g  <= orig_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
         b  <= orig_img_pxl[c_nb_buf_blue-1:0];
+        color<= {r,g,b};
+      end
+    end
+    else
+    begin
+      color<={5'd0, x[6:1], 5'd0};
+    end
   end
 
 endmodule

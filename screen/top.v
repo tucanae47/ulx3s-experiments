@@ -5,7 +5,7 @@ module top
      // VGA
      c_nb_line_pxls = 7, // log2i(c_img_cols-1) + 1;
      c_img_cols    = 80, // 7 bits
-     c_img_rows    = 60, //  6 bits
+     c_img_rows    = 80, //  6 bits
      c_img_pxls    = c_img_cols * c_img_rows,
      c_nb_img_pxls =  13,  //80*60=4800 -> 2^13
 
@@ -63,7 +63,21 @@ bram_buffer buf_rgb (
     .b(b)
 );
 
+reg [15:0] color;
 
+ always @ (posedge clk)
+  begin
+      if (x < c_img_rows) begin
+        if (y < c_img_cols) begin
+          color<={5'd0, x[6:1], 5'd0};
+        end
+      end
+      else begin
+        color<= {r,g,b};
+      end
+end
+
+// wire [15:0] color = (oled_img_addr>0)?{r,g,b}: {5'd0, x[6:1], 5'd0};
 
   //  wire [15:0] color = x[3] ^ y[3] ? {5'd0, x[6:1], 5'd0} : {y[5:1], 6'd0, 5'd0};
 // wire [15:0] color = (next_pixel)?{b,g,r}: 16'd0;
@@ -137,6 +151,4 @@ oled_video
 // wire [15:0] color = (next_pixel)?{b,g,r}: 16'd0;
     // Next pixel is not working
 // wire [15:0] color = {b,g,r};
-wire [15:0] color = {r,g,b};
 endmodule
-

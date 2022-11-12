@@ -3,36 +3,36 @@
 // LICENSE=BSD
 
 module oled_video
-#( parameter
-  // file name is relative to directory path in which verilog compiler is running
-  // screen can be also XY flipped and/or rotated from this init file
-  // c_init_file = "ssd1351.mem",
-// the only config file working, is with 44 bytes at the moment
-  c_init_file = "ssd1351_oinit.mem",
-  // c_init_file = "ssd1351_linit_xflip_16bit.mem",
-  // c_init_size = 59, // bytes in init file
-  c_init_size = 44, // bytes in init file
-  c_color_bits = 16, // 8 or 16 color depth (should match init file)
-  c_x_size = 128,  // pixel X screen size (don't touch)
-  c_y_size = 128,  // pixel Y screen size (don't touch)
-  c_x_bits = $clog2(c_x_size), // 96->7, fits X screen size (don't touch)
-  c_y_bits = $clog2(c_y_size)  // 64->6, fits X screen size (don't touch)
-)
-(
-  input  wire clk, // SPI display clock rate will be half of this clock rate
-  input  wire reset,
+  #( parameter
+     // file name is relative to directory path in which verilog compiler is running
+     // screen can be also XY flipped and/or rotated from this init file
+     // c_init_file = "ssd1351.mem",
+     // the only config file working, is with 44 bytes at the moment
+     c_init_file = "ssd1351_oinit.mem",
+     // c_init_file = "ssd1351_linit_xflip_16bit.mem",
+     // c_init_size = 59, // bytes in init file
+     c_init_size = 44, // bytes in init file
+     c_color_bits = 16, // 8 or 16 color depth (should match init file)
+     c_x_size = 128,  // pixel X screen size (don't touch)
+     c_y_size = 128,  // pixel Y screen size (don't touch)
+     c_x_bits = $clog2(c_x_size), // 96->7, fits X screen size (don't touch)
+     c_y_bits = $clog2(c_y_size)  // 64->6, fits X screen size (don't touch)
+   )
+   (
+     input  wire clk, // SPI display clock rate will be half of this clock rate
+     input  wire reset,
 
-  output reg  [c_x_bits-1:0] x,
-  output reg  [c_y_bits-1:0] y,
-  output reg  next_pixel, // 1 when x/y changes
-  input  wire [c_color_bits-1:0] color, // color = f(x,y) {3'bRRR, 3'bGGG, 2'bBB }
+     output reg  [c_x_bits-1:0] x,
+     output reg  [c_y_bits-1:0] y,
+     output reg  next_pixel, // 1 when x/y changes
+     input  wire [c_color_bits-1:0] color, // color = f(x,y) {3'bRRR, 3'bGGG, 2'bBB }
 
-  output wire spi_csn,
-  output wire spi_clk,
-  output wire spi_mosi,
-  output wire spi_dc,
-  output wire spi_resn
-);
+     output wire spi_csn,
+     output wire spi_clk,
+     output wire spi_mosi,
+     output wire spi_dc,
+     output wire spi_resn
+   );
 
   // "wire" should be used instead of "reg" because it's ROM.
   // trellis works with either "wire" or "reg"
@@ -50,82 +50,73 @@ module oled_video
 
   reg R_byte; // alternates data R_byte for 16-bit mode
   wire [7:0] color_to_data;
-  generate
-    if(c_color_bits < 12)
-      assign color_to_data = color;
-    else
-      assign color_to_data = R_byte ? color[15:8] : color[7:0];
-  endgenerate
+  assign color_to_data = R_byte ? color[15:8] : color[7:0];
   reg [7:0] datalow; // LSB byte of 16-bit data transfer
 
-  always @(posedge clk) begin
-      if (reset)
-        reset_cnt <= 2'b00;
-      else
+  always @(posedge clk)
+  begin
+    if (reset)
+      reset_cnt <= 2'b00;
+    else
+    begin
+      if (reset_cnt != 2'b10)
       begin
-        if (reset_cnt != 2'b10) 
+        reset_cnt <= reset_cnt+1;
+        index <= 10'd0;
+        data <= c_spi_init[0];
+        dc <= 1'b0;
+        x <= 0;
+        y <= 0;
+        R_byte <= 0;
+      end
+      else
+        if (index[9:4] != c_init_size)
         begin
-            reset_cnt <= reset_cnt+1;
-            index <= 10'd0;
-            data <= c_spi_init[0];
-            dc <= 1'b0;
-            x <= 0;
-            y <= 0;
-            R_byte <= 0;
-        end
-        else 
-        if (index[9:4] != c_init_size) 
-        begin
-            index <= index + 1;
-            if (index[3:0] == 4'h0)
-            begin
-                if (dc == 1'b0)
-                    data <= c_spi_init[index[9:4]];
-                else
-                begin
-                    if(c_color_bits < 12)
-                      data <= color;
-                    else
-                    begin
-                      R_byte <= ~R_byte;
-                      if(R_byte == 1'b0)
-                      begin
-                        datalow <= color[7:0];
-                        data <= color[15:8];
-                      end
-                      else
-                        data <= datalow;
-                    end
-                    if(c_color_bits < 12 || R_byte == 1'b0)
-                    begin
-                      next_pixel <= 1'b1;
-                      if (x == c_x_size-1)
-                      begin
-                        x <= 0;
-                        y <= y + 1;
-                      end
-                      else
-                        x <= x + 1;
-                    end
-                end
-            end
+          index <= index + 1;
+          if (index[3:0] == 4'h0)
+          begin
+            if (dc == 1'b0)
+              data <= c_spi_init[index[9:4]];
             else
             begin
-              next_pixel <= 1'b0;
-              if (index[0] == 1'b0) 
-                data[7:0] <= { data[6:0], 1'b0 };
+              R_byte <= ~R_byte;
+              if(R_byte == 1'b0)
+              begin
+                datalow <= color[7:0];
+                data <= color[15:8];
+              end
+              else
+                data <= datalow;
+              if(R_byte == 1'b0)
+              begin
+                next_pixel <= 1'b1;
+                if (x == c_x_size-1)
+                begin
+                  x <= 0;
+                  y <= y + 1;
+                end
+                else
+                  x <= x + 1;
+              end
             end
+          end
+          else
+          begin
+            next_pixel <= 1'b0;
+            if (index[0] == 1'b0)
+              data[7:0] <= { data[6:0], 1'b0 };
+          end
         end
-        else // if (index[9:4] == c_init_size) 
+        else // if (index[9:4] == c_init_size)
         begin
-            dc <= 1'b1;
-            index[9:4] <= c_init_size - 1;
+          dc <= 1'b1;
+          index[9:4] <= c_init_size - 1;
         end
-      end
+    end
   end
 
   assign spi_resn = ~reset_cnt[0];
-  assign spi_csn = reset_cnt[0]; 
+  assign spi_csn = reset_cnt[0];
   assign spi_dc = dc;
   assign spi_clk = ~index[0];
   assign spi_mosi = data[7];

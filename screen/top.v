@@ -136,6 +136,7 @@ oled_video
 // wire [15:0] color = (next_pixel)?{r,g,b}: 16'd0;
 // wire [15:0] color = (next_pixel)?{b,g,r}: 16'd0;
     // Next pixel is not working
-wire [15:0] color = {b,g,r};
+// wire [15:0] color = {b,g,r};
+wire [15:0] color = {r,g,b};
 endmodule
 

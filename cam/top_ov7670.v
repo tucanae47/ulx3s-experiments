@@ -129,19 +129,7 @@ module top_ov7670
 
   // localparam c_line_total = 80 * 60;
   localparam c_line_total = 520;
-// 
-  // always @(posedge wclk) begin
-  //   end_img <= vga_row[0];
-  // end
-  // always @(posedge wclk)
-  // begin
-  //   // assign end_img =  (orig_img_addr == c_line_total-1) ? 1'b1 : 1'b0;
-  //   // if (orig_img_addr > 2000)
-  //    if  (vga_row == c_line_total-1)
-  //     end_img <=1'b1;
-  //   else
-  //     end_img <=1'b0;
-  // end
+
   vga_display
     # (
       .c_img_cols(c_img_cols), // 7 bits
@@ -178,76 +166,6 @@ module top_ov7670
   wire   end_cnt_line;
   wire   new_line, new_pxl;
 
-  // always @ (posedge oclk)
-  // begin
-  //   if (~capture_wen)
-  //     oled_img_addr <= 0;
-  //   else
-  //   begin
-  //     if (x < c_img_rows)
-  //     begin
-  //       if (y < c_img_cols)
-  //       begin
-  //         oled_img_addr <= oled_img_addr + 1;
-  //       end
-  //     end
-  //     else
-  //       oled_img_addr <= 0;
-  //   end
-  // end
-
-  // assign end_cnt_pxl =  (cntO_pxl == c_pxl_total-1) ? 1'b1 : 1'b0;
-
-  // // new line: when in the end of the count and there is a new pixel
-  // assign new_line = end_cnt_pxl;
-
-
-  // always @ (posedge oclk)
-  // begin
-  //   if (~capture_wen)
-  //     cntO_line <= 10'd0;
-  //   else
-  //   begin
-  //     if (new_line)
-  //     begin
-  //       if (end_cnt_line)
-  //         cntO_line <= 10'd0;
-  //       else
-  //         cntO_line <= cntO_line + 1;
-  //     end
-  //   end
-  // end
-
-  // // end of pixel count
-  // assign end_cnt_line =  (cntO_line == c_line_total-1) ? 1'b1 : 1'b0;
-
-  // always @(posedge oclk)
-  // begin
-  //   if (next_pixel)
-  //   begin
-
-  //     r  <= {1'b0, oled_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red]};
-  //     g  <= {1'b0, oled_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue]};
-  //     b  <= {2'b0, oled_img_pxl[c_nb_buf_blue-1:0]};
-  //     // r  <= oled_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
-  //     // g  <= oled_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
-  //     // b  <= oled_img_pxl[c_nb_buf_blue-1:0];
-  //   end
-  // end
-
-  // assign r  = oled_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
-  // assign g  = oled_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
-  // assign b  = oled_img_pxl[c_nb_buf_blue-1:0];
-  //  reg [15:0] color;
-
-  //  wire [15:0] color = vga_col[3] ^ vga_row[3] ? {5'd0, vga_row[6:1], 5'd0} : {vga_col[5:1], 6'd0, 5'd0};
-  //  wire [15:0] color = {vga_row[5:0],5'd0,  vga_col[5:0]};
-  // wire [15:0] color = {6'd255,5'd0, 6'd255};
-  
-      // color = {x[5:0],5'd0,  y[5:0]};
-
-  //  wire [15:0] color = {vga_row[5:0],5'd0,  vga_col[5:0]};
-  // camera frame buffer, before processing
   frame_buffer
     # (
       .c_img_cols(c_img_cols), // 7 bits
@@ -265,57 +183,12 @@ module top_ov7670
       .doutb   (orig_img_pxl)
     );
 
-  // frame_buffer
-  //   # (
-  //     .c_img_cols(c_img_cols), // 7 bits
-  //     .c_img_rows(c_img_rows), //  6 bits
-  //     .c_img_pxls(c_img_cols * c_img_rows),
-  //     .c_nb_img_pxls(c_nb_img_pxls)
-  //   )
-  //   cam_fb_oled
-  //   (
-  //     .clk     (oclk),
-  //     .wea     (~capture_wen),
-  //     .addra   (orig_img_addr),
-  //     .dina    (orig_img_pxl),
-  //     .addrb   (oled_img_addr),
-  //     .doutb   (oled_img_pxl)
-  //   );
   localparam STATE_LOAD           = 0;
   localparam STATE_UPDATE         = 1;
   reg enr;
 
-  //  always @(posedge wclk)
-  //   begin
-  //     if(reset)
-  //     begin
-  //       dac_state           <= STATE_LOAD;
-  //       img<=0;
-  //     end
-  //     else
-  //     begin
-  //       case(dac_state)
-  //         STATE_LOAD:
-  //         begin
-  //             if (end_cnt_line)
-  //               img <= img + 1;
-  //             if (img > 2)
-  //               dac_state       <= STATE_UPDATE;
-  //         end
-  //         STATE_UPDATE: begin
-  //           dac_state       <= STATE_WAIT;
-  //         end
-  //         default:
-  //           dac_state       <= STATE_WAIT;
-  //       endcase
-  //     end
-  // reg [15:0] color;
-  // wire [15:0] color;
   reg end_img;
-  // color <= {vga_row[5:0],5'd0,  vga_col[5:0]};
-  // assign color = {img[5:0] ^ img[6:1],img[7:3] ^ img[4:0], img[7:2] ^ img[5:0]};
 
-  // wire [15:0] color = img[5:0] ^ img[6:1] ? {5'd0, img[6:1], 5'd0} : {img[5:1], 6'd0, 5'd0};
   always @(posedge wclk) begin
   if (vga_row == c_img_rows -1 && vga_col == c_img_cols - 1) 
       end_img<= 1;
@@ -323,13 +196,6 @@ module top_ov7670
       end_img<= 0;
   end
   reg [7:0] img, img_g;
-  // always @(posedge end_img)
-  // begin
-  //   if(rst)
-  //     img<=0;
-  //   else
-  //     img <= img + 1;
-  // end
   localparam N = 8;
 
   always @(posedge end_img)
@@ -344,9 +210,7 @@ module top_ov7670
     end
       // img <= img ^ img[7:1]; 
   end
-  assign led = img_g;
-  // stop capturing to see what happens with the image
-  // if btnd is not pressed -> normal capture
+  assign led[5:0] = img_g[5:0];
   // assign capture_wen = (btnd==1'b0 && ~enr) ? capture_we : 1'b0;
   // assign capture_wen = (img < 10 && btnd==1'b0) ? capture_we : 1'b0;
   assign capture_wen = (~enable_oled && btnd==1'b0 ) ? capture_we : 1'b0;
@@ -368,8 +232,6 @@ module top_ov7670
       .href         (ov7670_href),
       .rgbmode      (rgbmode),
       .swap_r_b     (swap_r_b),
-      //.dataout_test (ov_capture_datatest),
-      //.led_test     (led[3:0]),
       .data         (ov7670_d),
       .addr         (capture_addr),
       .dout         (capture_data),
@@ -383,20 +245,21 @@ module top_ov7670
                     .clk          (oclk),
                     .resend       (resend),
                     .rgbmode      (rgbmode),
-                    .testmode     (testmode),
                     // .cnt_reg_test (led[5:0]),
+                    .testmode     (testmode),
                     .done         (config_finished),
                     .sclk         (ov7670_sioc),
                     .sdat_on      (sdat_on),
                     .sdat_out     (sdat_out),
                     .ov7670_rst_n (ov7670_rst_n),
                     .ov7670_clk   (ov7670_xclk),
-                    //.ov7670_pwdn  (ov7670_pwdn)
                   );
   assign ov7670_pwdn = 1'b0; //not working from the component
 
   assign resend = 1'b0;
   assign ov7670_siod = sdat_on ? sdat_out : 1'bz;
+
+  assign led[7] = config_finished;
 //  always @(posedge wclk) begin
   
   // assign led[7:5] = vga_row[8:6];
@@ -449,74 +312,15 @@ module top_ov7670
       .spi_resn(oled_resn)
     );
 
-  // end
-  // assign r = orig_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
-  // assign g = orig_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
-  // assign b = orig_img_pxl[c_nb_buf_blue-1:0];
-
   assign wclk = clk50mhz;
-  // assign wclk = clk25mhz;
   assign oclk = clk25mhz;
-  // //   assign rrst_n = btn0;
-
-  // always @(posedge wclk)
-  // begin
-  //   if(rst)
-  //   begin
-  //     winc<= 1;
-  //     wrst_n <= 0;
-  //   end
-  //   else
-  //   begin
-  //     //  wdata <= {{1'b0, vga_red},{1'b0, vga_green},{2'b0, vga_blue}};
-  //     wdata <= orig_img_pxl;
-  //     // wdata <= capture_data;
-  //   end
-  // end
-
-  // wire [15:0] color = {b, r, g};
   wire [15:0] color = {r,g,b};
-  // wire [15:0] color = {b, g, r};
   always @(posedge oclk)
   begin
-    // if(rst)
-    // begin
-    //   rinc <=1;
-    //   rrst_n<=0;
-    // end
-    // begin
-      // if (next_pixel)
-      // begin
-        // r  <= {1'b0, orig_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red]};
-        // g  <= {1'b0, orig_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue]};
-        // b  <= {2'b0, orig_img_pxl[c_nb_buf_blue-1:0]};
         r  <= orig_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
         g  <= orig_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
         b  <= orig_img_pxl[c_nb_buf_blue-1:0];
-      // end
-    // end
   end
 
-  // // we need async fifo to keep to clocks one for the tpu and other for the input stream
-  // async_fifo
-  //   #(
-  //     DSIZE,
-  //     ASIZE
-  //   )
-  //   fifo
-  //   (
-  //     wclk,
-  //     wrst_n,
-  //     winc,
-  //     wdata,
-  //     wfull,
-  //     awfull,
-  //     oclk,
-  //     rrst_n,
-  //     rinc,
-  //     rdata,
-  //     rempty,
-  //     arempty
-  //   );
 endmodule
 

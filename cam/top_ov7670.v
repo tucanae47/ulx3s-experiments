@@ -51,8 +51,7 @@ module top_ov7670
     );
 
 
-  // reg  winc, wclk, oclk;
-  reg  oclk;
+  reg  winc, wclk, oclk;
   // rclk;
   reg  [DSIZE-1:0] wdata;
   reg              wrst_n;
@@ -103,14 +102,14 @@ module top_ov7670
   wire          locked_wire;
   parameter     swap_r_b = 1'b1; // red and blue are swapped
 
-  // wire clk = clk25mhz;
-  // // 50 MHz clock
-  // pll i_pll
-  //     (
-  //       .clkin(clk25mhz),
-  //       .clkout0(clk50mhz),
-  //       .locked(locked_wire)
-  //     );
+  wire clk = clk25mhz;
+  // 50 MHz clock
+  pll i_pll
+      (
+        .clkin(clk25mhz),
+        .clkout0(clk50mhz),
+        .locked(locked_wire)
+      );
 
 
 
@@ -167,12 +166,12 @@ module top_ov7670
   wire   new_line, new_pxl;
 
   frame_buffer
-    # (
-      .c_img_cols(c_img_cols), // 7 bits
-      .c_img_rows(c_img_rows), //  6 bits
-      .c_img_pxls(c_img_cols * c_img_rows),
-      .c_nb_img_pxls(c_nb_img_pxls)
-    )
+    // # (
+    //   .c_img_cols(c_img_cols), // 7 bits
+    //   .c_img_rows(c_img_rows), //  6 bits
+    //   .c_img_pxls(c_img_cols * c_img_rows),
+    //   .c_nb_img_pxls(c_nb_img_pxls)
+    // )
     cam_fb
     (
       .clk     (oclk),
@@ -275,9 +274,13 @@ module top_ov7670
   wire [6:0] x;
   wire [6:0] y;
 
-  reg [4:0] r= {5{1'b0}};
-  reg [4:0] g= {5{1'b0}};
-  reg [5:0] b= {6{1'b0}};
+  // reg [4:0] r= {5{1'b0}};
+  // reg [4:0] g= {5{1'b0}};
+  // reg [5:0] b= {6{1'b0}};
+
+  reg [4:0] r;
+  reg [4:0] g;
+  reg [5:0] b;
   // wire [4:0] r2;
   // wire [4:0] g2;
   // wire [5:0] b2;
@@ -321,12 +324,11 @@ module top_ov7670
   assign wclk = clk50mhz;
   assign oclk = clk25mhz;
   reg [15:0] color;
-
-  // wire [15:0] color = {r,g,b};
   always @(posedge oclk)
   begin
     if (rst) begin
       orig_img_addr <= 0;
+      {r,g,b}<={5'd0, 5'd0, 6'd0};
     end
     else
     begin
@@ -342,10 +344,9 @@ module top_ov7670
       end
       else begin
         orig_img_addr <= 0;
-        // color<={5'd0, x[6:1], 5'd0};
+        // color<={5'd0, x[6:1], 6'd0};
         // {r,g,b}<={5'd0, x[6:1], 5'd0};
-
-        color<={5'd12, 5'd134, 6'd0};
+        color<={5'd24, 5'd0, 6'd32};
         // color<= {r2,g2,b2};
       end
     end

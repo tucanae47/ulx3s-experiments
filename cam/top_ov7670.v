@@ -116,48 +116,48 @@ module top_ov7670
 
 
 
-  vga_sync i_vga
-           (
-             .rst     (rst),
-             .clk     (wclk),
-             .visible (vga_visible),
-             .new_pxl (vga_new_pxl),
-             .hsync   (vga_hsync_wr),
-             .vsync   (vga_vsync_wr),
-             .col     (vga_col),
-             .row     (vga_row)
-             //  .end_img (end_img)
-           );
+  // vga_sync i_vga
+  //          (
+  //            .rst     (rst),
+  //            .clk     (wclk),
+  //            .visible (vga_visible),
+  //            .new_pxl (vga_new_pxl),
+  //            .hsync   (vga_hsync_wr),
+  //            .vsync   (vga_vsync_wr),
+  //            .col     (vga_col),
+  //            .row     (vga_row)
+  //            //  .end_img (end_img)
+  //          );
 
-  // localparam c_line_total = 80 * 60;
-  localparam c_line_total = 520;
+  // // localparam c_line_total = 80 * 60;
+  // localparam c_line_total = 520;
 
-  vga_display
-    # (
-      .c_img_cols(c_img_cols), // 7 bits
-      .c_img_rows(c_img_rows), //  6 bits
-      .c_img_pxls(c_img_cols * c_img_rows),
-      .c_nb_img_pxls(c_nb_img_pxls)
-    )
-    I_ov_display
-    (
-      .rst        (rst),
-      .clk        (wclk),
-      .visible    (vga_visible),
-      .new_pxl    (vga_new_pxl),
-      .hsync      (vga_hsync_wr),
-      .vsync      (vga_vsync_wr),
-      .rgbmode    (rgbmode),
-      .col        (vga_col),
-      .row        (vga_row),
-      .frame_pixel(orig_img_pxl),
-      .frame_addr (orig_img_addr),
-      .hsync_out  (vga_hsync),
-      .vsync_out  (vga_vsync),
-      .vga_red    (vga_red),
-      .vga_green  (vga_green),
-      .vga_blue   (vga_blue)
-    );
+  // vga_display
+  //   # (
+  //     .c_img_cols(c_img_cols), // 7 bits
+  //     .c_img_rows(c_img_rows), //  6 bits
+  //     .c_img_pxls(c_img_cols * c_img_rows),
+  //     .c_nb_img_pxls(c_nb_img_pxls)
+  //   )
+  //   I_ov_display
+  //   (
+  //     .rst        (rst),
+  //     .clk        (wclk),
+  //     .visible    (vga_visible),
+  //     .new_pxl    (vga_new_pxl),
+  //     .hsync      (vga_hsync_wr),
+  //     .vsync      (vga_vsync_wr),
+  //     .rgbmode    (rgbmode),
+  //     .col        (vga_col),
+  //     .row        (vga_row),
+  //     .frame_pixel(orig_img_pxl),
+  //     .frame_addr (orig_img_addr),
+  //     .hsync_out  (vga_hsync),
+  //     .vsync_out  (vga_vsync),
+  //     .vga_red    (vga_red),
+  //     .vga_green  (vga_green),
+  //     .vga_blue   (vga_blue)
+  //   );
   // count 2 clock cycles to get a pixel cycle
   reg  [10-1:0]  cntO_pxl;
   reg  [10-1:0]  cntO_line;
@@ -167,39 +167,39 @@ module top_ov7670
   wire   end_cnt_pxl;
   wire   end_cnt_line;
   wire   new_line, new_pxl;
-frame_buffer
+// frame_buffer
+//     #(
+//       .c_img_cols(c_img_cols), // 7 bits
+//       .c_img_rows(c_img_rows), //  6 bits
+//       .c_img_pxls(c_img_cols * c_img_rows),
+//       .c_nb_img_pxls(c_nb_img_pxls)
+//     )
+//     cam_vga
+//     (
+//       .clk     (oclk),
+//       .wea     (capture_wen),
+//       .addra   (capture_addr),
+//       .dina    (capture_data),
+//       .addrb   (orig_img_addr),
+//       .doutb   (orig_img_pxl)
+//     );
+
+  frame_buffer
     #(
       .c_img_cols(c_img_cols), // 7 bits
       .c_img_rows(c_img_rows), //  6 bits
       .c_img_pxls(c_img_cols * c_img_rows),
       .c_nb_img_pxls(c_nb_img_pxls)
     )
-    cam_vga
+    cam_fb
     (
       .clk     (oclk),
       .wea     (capture_wen),
       .addra   (capture_addr),
       .dina    (capture_data),
-      .addrb   (orig_img_addr),
-      .doutb   (orig_img_pxl)
+      .addrb   (oled_img_addr),
+      .doutb   (oled_img_pxl)
     );
-
-  // frame_buffer
-  //   #(
-  //     .c_img_cols(c_img_cols), // 7 bits
-  //     .c_img_rows(c_img_rows), //  6 bits
-  //     .c_img_pxls(c_img_cols * c_img_rows),
-  //     .c_nb_img_pxls(c_nb_img_pxls)
-  //   )
-  //   cam_fb
-  //   (
-  //     .clk     (oclk),
-  //     .wea     (capture_wen),
-  //     .addra   (capture_addr),
-  //     .dina    (capture_data),
-  //     .addrb   (oled_img_addr),
-  //     .doutb   (oled_img_pxl)
-  //   );
 
   localparam STATE_LOAD           = 0;
   localparam STATE_UPDATE         = 1;
@@ -280,53 +280,53 @@ frame_buffer
   assign wclk = clk50mhz;
   assign oclk = clk50mhz;
   // wire [15:0] color = {r, g, b};
-  // oled_video
-  //   oled_video_inst
-  //   (
-  //     .clk(oclk),
-  //     // .reset(rst),
-  //     .reset(~btn0),
-  //     // .reset(enable_oled),
-  //     // .reset(~capture_wen),
-  //     .next_pixel(next_pixel),
-  //     .x(x),
-  //     .y(y),
-  //     .color(color),
-  //     .spi_csn(oled_csn),
-  //     .spi_clk(oled_clk),
-  //     .spi_mosi(oled_mosi),
-  //     .spi_dc(oled_dc),
-  //     .spi_resn(oled_resn)
-  //   );
+  oled_video
+    oled_video_inst
+    (
+      .clk(oclk),
+      .reset(rst),
+      // .reset(~btn0),
+      // .reset(enable_oled),
+      // .reset(~capture_wen),
+      .next_pixel(next_pixel),
+      .x(x),
+      .y(y),
+      .color(color),
+      .spi_csn(oled_csn),
+      .spi_clk(oled_clk),
+      .spi_mosi(oled_mosi),
+      .spi_dc(oled_dc),
+      .spi_resn(oled_resn)
+    );
 
-  // assign wclk = clk50mhz;
-  // assign oclk = clk50mhz;
-  // reg [15:0] color;
-  // always @(posedge oclk)
-  // begin
-  //   if (rst) begin
-  //     oled_img_addr <= 0;
-  //     {r,g,b}<={5'd0, 5'd0, 6'd0};
-  //   end
-  //   else
-  //   begin
-  //     if (x < c_img_rows) begin
-  //       if (y < c_img_cols) begin
-  //       // capture_we <= ~capture_we;
-  //         r  <= oled_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
-  //         g  <= oled_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
-  //         b  <= oled_img_pxl[c_nb_buf_blue-1:0];
-  //         oled_img_addr <= oled_img_addr + 1;
-  //         color<= {r,g,b};
-  //       end
-  //     end
-  //     else begin
-  //       oled_img_addr <= 0;
-  //       color<={5'd24, 5'd0, 6'd32};
-  //       // capture_we <= ~capture_we;
-  //     end
-  //   end
-  // end
+  assign wclk = clk50mhz;
+  assign oclk = clk50mhz;
+  reg [15:0] color;
+  always @(posedge oclk)
+  begin
+    if (rst) begin
+      oled_img_addr <= 0;
+      {r,g,b}<={5'd0, 5'd0, 6'd0};
+    end
+    else
+    begin
+      if (oled_img_addr < 16384) begin
+        // if (y < c_img_cols) begin
+        // capture_we <= ~capture_we;
+          r  <= oled_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];
+          g  <= oled_img_pxl[c_nb_buf-c_nb_buf_red-1:c_nb_buf_blue];
+          b  <= oled_img_pxl[c_nb_buf_blue-1:0];
+          oled_img_addr <= oled_img_addr + 1;
+          color<= {r,g,b};
+        // end
+      end
+      // else begin
+      //   oled_img_addr <= 0;
+      //   color<={5'd24, 5'd0, 6'd32};
+      //   // capture_we <= ~capture_we;
+      // end
+    end
+  end
 
 endmodule
 

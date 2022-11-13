@@ -34,9 +34,9 @@ module vga_display
 
 
 
-    c_nb_buf_red   =  4,  // n bits for red in the buffer (memory)
-    c_nb_buf_green =  4,  // n bits for green in the buffer (memory)
-    c_nb_buf_blue  =  4,  // n bits for blue in the buffer (memory)
+    c_nb_buf_red   =  5,  // n bits for red in the buffer (memory)
+    c_nb_buf_green =  5,  // n bits for green in the buffer (memory)
+    c_nb_buf_blue  =  6,  // n bits for blue in the buffer (memory)
     // word width of the memory (buffer)
     c_nb_buf       =   c_nb_buf_red + c_nb_buf_green + c_nb_buf_blue
   )

@@ -299,8 +299,6 @@ module top_ov7670
       .spi_resn(oled_resn)
     );
 
-  assign wclk = clk50mhz;
-  assign oclk = clk50mhz;
   reg [15:0] color;
   always @(posedge oclk)
   begin
@@ -320,11 +318,11 @@ module top_ov7670
           color<= {r,g,b};
         // end
       end
-      // else begin
-      //   oled_img_addr <= 0;
-      //   color<={5'd24, 5'd0, 6'd32};
-      //   // capture_we <= ~capture_we;
-      // end
+      else begin
+        oled_img_addr <= 0;
+        // color<={5'd24, 5'd0, 6'd32};
+        // capture_we <= ~capture_we;
+      end
     end
   end
 

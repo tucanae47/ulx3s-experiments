@@ -2,11 +2,17 @@
 
 module top_ov7670
   # (parameter
-    c_img_cols    = 320, // 9 bits
-     c_img_rows    = 240, // 8 bits
-     c_img_pxls    = c_img_cols * c_img_rows,
-     c_nb_line_pxls = 9, // log2i(c_img_cols-1) + 1;
-     c_nb_img_pxls =  17,  //320*240=76,800 -> 2^17
+    // c_img_cols    = 320, // 9 bits
+    //  c_img_rows    = 240, // 8 bits
+    //  c_img_pxls    = c_img_cols * c_img_rows,
+    //  c_nb_line_pxls = 9, // log2i(c_img_cols-1) + 1;
+    //  c_nb_img_pxls =  17,  //320*240=76,800 -> 2^17
+
+     c_nb_line_pxls = 8, // log2i(c_img_cols-1) + 1;
+      c_img_cols    = 160, // 8 bits
+      c_img_rows    = 120, //  7 bits
+      c_img_pxls    = c_img_cols * c_img_rows,
+      c_nb_img_pxls =  15,  //160*120=19.200 -> 2^15
      // VGA
     //  c_nb_line_pxls = 7, // log2i(c_img_cols-1) + 1;
     //  c_img_cols    = 80, // 7 bits
@@ -116,73 +122,73 @@ module top_ov7670
 
 
 
-  // vga_sync i_vga
-  //          (
-  //            .rst     (rst),
-  //            .clk     (wclk),
-  //            .visible (vga_visible),
-  //            .new_pxl (vga_new_pxl),
-  //            .hsync   (vga_hsync_wr),
-  //            .vsync   (vga_vsync_wr),
-  //            .col     (vga_col),
-  //            .row     (vga_row)
-  //            //  .end_img (end_img)
-  //          );
+  vga_sync i_vga
+           (
+             .rst     (rst),
+             .clk     (wclk),
+             .visible (vga_visible),
+             .new_pxl (vga_new_pxl),
+             .hsync   (vga_hsync_wr),
+             .vsync   (vga_vsync_wr),
+             .col     (vga_col),
+             .row     (vga_row)
+             //  .end_img (end_img)
+           );
 
-  // // localparam c_line_total = 80 * 60;
+  // localparam c_line_total = 80 * 60;
   // localparam c_line_total = 520;
 
-  // vga_display
-  //   # (
-  //     .c_img_cols(c_img_cols), // 7 bits
-  //     .c_img_rows(c_img_rows), //  6 bits
-  //     .c_img_pxls(c_img_cols * c_img_rows),
-  //     .c_nb_img_pxls(c_nb_img_pxls)
-  //   )
-  //   I_ov_display
-  //   (
-  //     .rst        (rst),
-  //     .clk        (wclk),
-  //     .visible    (vga_visible),
-  //     .new_pxl    (vga_new_pxl),
-  //     .hsync      (vga_hsync_wr),
-  //     .vsync      (vga_vsync_wr),
-  //     .rgbmode    (rgbmode),
-  //     .col        (vga_col),
-  //     .row        (vga_row),
-  //     .frame_pixel(orig_img_pxl),
-  //     .frame_addr (orig_img_addr),
-  //     .hsync_out  (vga_hsync),
-  //     .vsync_out  (vga_vsync),
-  //     .vga_red    (vga_red),
-  //     .vga_green  (vga_green),
-  //     .vga_blue   (vga_blue)
-  //   );
+  vga_display
+    # (
+      .c_img_cols(c_img_cols), // 7 bits
+      .c_img_rows(c_img_rows), //  6 bits
+      .c_img_pxls(c_img_cols * c_img_rows),
+      .c_nb_img_pxls(c_nb_img_pxls)
+    )
+    I_ov_display
+    (
+      .rst        (rst),
+      .clk        (wclk),
+      .visible    (vga_visible),
+      .new_pxl    (vga_new_pxl),
+      .hsync      (vga_hsync_wr),
+      .vsync      (vga_vsync_wr),
+      .rgbmode    (rgbmode),
+      .col        (vga_col),
+      .row        (vga_row),
+      .frame_pixel(orig_img_pxl),
+      .frame_addr (orig_img_addr),
+      .hsync_out  (vga_hsync),
+      .vsync_out  (vga_vsync),
+      .vga_red    (vga_red),
+      .vga_green  (vga_green),
+      .vga_blue   (vga_blue)
+    );
   // count 2 clock cycles to get a pixel cycle
   reg  [10-1:0]  cntO_pxl;
   reg  [10-1:0]  cntO_line;
-  wire [10:0] c_line_total = 9'd80;
-  wire [10:0] c_pxl_total = 9'd60;
+  // wire [10:0] c_line_total = 9'd80;
+  // wire [10:0] c_pxl_total = 9'd60;
 
   wire   end_cnt_pxl;
   wire   end_cnt_line;
   wire   new_line, new_pxl;
-// frame_buffer
-//     #(
-//       .c_img_cols(c_img_cols), // 7 bits
-//       .c_img_rows(c_img_rows), //  6 bits
-//       .c_img_pxls(c_img_cols * c_img_rows),
-//       .c_nb_img_pxls(c_nb_img_pxls)
-//     )
-//     cam_vga
-//     (
-//       .clk     (oclk),
-//       .wea     (capture_wen),
-//       .addra   (capture_addr),
-//       .dina    (capture_data),
-//       .addrb   (orig_img_addr),
-//       .doutb   (orig_img_pxl)
-//     );
+frame_buffer
+    #(
+      .c_img_cols(c_img_cols), // 7 bits
+      .c_img_rows(c_img_rows), //  6 bits
+      .c_img_pxls(c_img_cols * c_img_rows),
+      .c_nb_img_pxls(c_nb_img_pxls)
+    )
+    cam_vga
+    (
+      .clk     (oclk),
+      .wea     (capture_wen),
+      .addra   (capture_addr),
+      .dina    (capture_data),
+      .addrb   (orig_img_addr),
+      .doutb   (orig_img_pxl)
+    );
 
   frame_buffer
     #(
@@ -201,29 +207,66 @@ module top_ov7670
       .doutb   (oled_img_pxl)
     );
 
-  localparam STATE_LOAD           = 0;
-  localparam STATE_UPDATE         = 1;
+  localparam STATE_LOAD           = 1;
+  localparam STATE_INIT        = 2;
+  localparam STATE_DISPLAY         = 4;
   reg enr;
 
   reg end_img;
+  reg [2:0]  state;
+ always @(posedge clk) begin
+        if(rst) begin
+                state<=STATE_INIT;
+        end else begin
+          case(state)
+                STATE_INIT: begin
+                  if (config_finished==1'b1) begin
+                      state <= STATE_LOAD;
+                  end
+                end
+                STATE_LOAD: begin
+                    if (capture_addr==0) begin
+                    state<= STATE_DISPLAY;
+                    cam_reset <= ~cam_reset;
+                    end
+                end
+                STATE_DISPLAY: begin
+                // if (oled_img_addr > 16000)
+                  // state<=STATE_LOAD;
+                  oled_reset <= ~oled_reset;
+                end
+                default:
+                state<=STATE_INIT;
+          endcase
+        end
+    end
 
+ 
   assign led[7] = config_finished;
-  assign led[6] = enable_oled;
+  // assign led[6] = enable_oled;
+  assign led[0] = state[0];
+  assign led[1] = state[1];
+  assign led[2] = (oled_img_addr==0) ? 1'b1 : 1'b0;
+  // assign led[2] = (capture_addr==0)?;
+  // assign led[3:5] = {1'b0, 1'b0, 1'b0};
+  assign led[3:6] = capture_addr[c_nb_img_pxls-4:c_nb_img_pxls-1];
   wire enable_oled;
-  assign enable_oled = (img>8'd254) ? 1'b1 : 1'b0;
+  wire cam_reset = ~btn0;
+  wire oled_reset = ~btnd;
+  // assign enable_oled = (img>8'd254) ? 1'b1 : 1'b0;
   assign capture_wen = (~enable_oled) ? capture_we : 1'b0;
 
   ov7670_capture
     # (
       .c_img_cols(c_img_cols), // 7 bits
       .c_img_rows(c_img_rows), //  6 bits
-      .c_nb_line_pxls(c_nb_img_pxls),
+      .c_nb_line_pxls(c_nb_line_pxls),
       .c_img_pxls(c_img_cols * c_img_rows),
       .c_nb_img_pxls(c_nb_img_pxls)
     )
     capture
     (
-      .rst          (rst),
+      .rst          (cam_reset),
       .clk          (oclk),
       .pclk         (ov7670_pclk),
       .vsync        (ov7670_vsync),
@@ -239,10 +282,11 @@ module top_ov7670
 
   ov7670_top_ctrl controller
                   (
-                    .rst          (rst),
+                  .rst          (cam_reset),
+                    // .rst          (rst),
                     .clk          (oclk),
                     .resend       (resend),
-                    .cnt_reg_test (led[5:0]),
+                    // .cnt_reg_test (led[5:0]),
                     .rgbmode      (rgbmode),
                     // .cnt_reg_test (led[5:0]),
                     .testmode     (testmode),
@@ -284,7 +328,7 @@ module top_ov7670
     oled_video_inst
     (
       .clk(oclk),
-      .reset(rst),
+      .reset(oled_reset),
       // .reset(~btn0),
       // .reset(enable_oled),
       // .reset(~capture_wen),

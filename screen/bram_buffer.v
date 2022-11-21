@@ -31,7 +31,8 @@ reg [11:0] buffer[SZ];
 
 // initialize RAM 
 initial begin 
-    $readmemh("blank.mem", buffer); 
+    $readmemh("im.mem", buffer); 
+    // $readmemh("blank.mem", buffer); 
 end
 // compute read address 
 
@@ -40,13 +41,13 @@ wire [17:0] read_addr = 8'd128 * row + col;
 // define read access 
 always @ (posedge clk) begin
     if (oe) begin
-        // r  <= {1'b0, buffer[read_addr][c_nb_buf-1: c_nb_buf-c_red]};
-        // g  <= {1'b0, buffer[read_addr][c_nb_buf-c_red-1:c_blue]};
-        // b  <= {2'b0, buffer[read_addr][c_blue-1:0]};
+        r  <= {1'b0, buffer[read_addr][c_nb_buf-1: c_nb_buf-c_red]};
+        g  <= {1'b0, buffer[read_addr][c_nb_buf-c_red-1:c_blue]};
+        b  <= {2'b0, buffer[read_addr][c_blue-1:0]};
 
-        r  <= buffer[read_addr][c_nb_buf-1: c_nb_buf-c_red];
-        g  <= buffer[read_addr][c_nb_buf-c_red-1:c_blue];
-        b  <= buffer[read_addr][c_blue-1:0];
+        // r  <= buffer[read_addr][c_nb_buf-1: c_nb_buf-c_red];
+        // g  <= buffer[read_addr][c_nb_buf-c_red-1:c_blue];
+        // b  <= buffer[read_addr][c_blue-1:0];
     end
 end
 

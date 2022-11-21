@@ -362,8 +362,19 @@ frame_buffer
 
   // wire [15:0] color=  {r,g,b};
 reg [15:0] color;
-always @ (posedge oclk)begin
+// always @ (posedge oclk)begin
+//         color<= {r,g,b};
+end
+always @ (posedge clk)
+  begin
+      if (x < c_img_rows) begin
+        if (y < c_img_cols) begin
+          color<={5'd0, x[6:1], 5'd0};
+        end
+      end
+      else begin
         color<= {r,g,b};
+      end
 end
 
   // assign  r  = oled_img_pxl[c_nb_buf-1: c_nb_buf-c_nb_buf_red];

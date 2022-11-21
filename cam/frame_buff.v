@@ -35,7 +35,7 @@ module frame_buff
   output reg [5:0] b,     // 4
    );
 
-  wire [17:0] read_addr = 8'd128 * row + col;
+  wire [17:0] read_addr = 8'd80 * row + col;
   reg  [c_nb_buf-1:0] buffer[c_img_pxls-1:0];
 
   always @ (posedge clk)

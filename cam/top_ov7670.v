@@ -201,10 +201,14 @@ frame_buffer
 
   frame_buff
     #(
-      .c_img_cols(128), // 7 bits
-      .c_img_rows(128), //  6 bits
-      .c_img_pxls(128*128),
-      .c_nb_img_pxls(14)
+      .c_img_cols(c_img_cols), // 7 bits
+      .c_img_rows(c_img_rows), //  6 bits
+      .c_img_pxls(c_img_cols * c_img_rows),
+      .c_nb_img_pxls(c_nb_img_pxls)
+      // .c_img_cols(128), // 7 bits
+      // .c_img_rows(128), //  6 bits
+      // .c_img_pxls(128*128),
+      // .c_nb_img_pxls(14)
     )
     cam_fb
     (
@@ -364,16 +368,16 @@ frame_buffer
 reg [15:0] color;
 // always @ (posedge oclk)begin
 //         color<= {r,g,b};
-end
-always @ (posedge clk)
+// end
+always @ (posedge oclk)
   begin
       if (x < c_img_rows) begin
         if (y < c_img_cols) begin
-          color<={5'd0, x[6:1], 5'd0};
+          color<= {r,g,b};
         end
       end
       else begin
-        color<= {r,g,b};
+          color<={5'd0, 6'd128, 5'd0};
       end
 end
 

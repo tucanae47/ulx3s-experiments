@@ -45,6 +45,7 @@ module frame_buff
     r  <= {1'b0, buffer[read_addr][c_nb_buf-1: c_nb_buf-c_red]};
     g  <= {1'b0, buffer[read_addr][c_nb_buf-c_red-1:c_blue]};
     b  <= {2'b0, buffer[read_addr][c_blue-1:0]};
+
   end
 
 endmodule

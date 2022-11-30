@@ -373,11 +373,15 @@ always @ (posedge oclk)
   begin
       if (x < c_img_rows) begin
         if (y < c_img_cols) begin
-          color<= {r,g,b};
+          // color<= {r,g,b};
+          color<= {b,g,r};
         end
       end
       else begin
-          color<={5'd0, 6'd128, 5'd0};
+          color<={5'd32, 6'd0, 5'd0};
+          // color<={5'd32, 6'd0, 5'd0};
+          // color<={5'd0, 6'd64, 5'd0};
+          // color<={5'd0, 6'd128, 5'd0};
       end
 end
 

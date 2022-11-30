@@ -378,7 +378,7 @@ always @ (posedge oclk)
         end
       end
       else begin
-          color<={5'd32, 6'd0, 5'd0};
+          color<={5'd31, 6'd63, 5'd31};
           // color<={5'd32, 6'd0, 5'd0};
           // color<={5'd0, 6'd64, 5'd0};
           // color<={5'd0, 6'd128, 5'd0};

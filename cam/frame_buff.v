@@ -35,6 +35,9 @@ module frame_buff
   output reg [5:0] b,     // 4
    );
 
+localparam c_red   =  4;  // n bits for red in the buffer (memory)
+localparam c_green =  4;  // n bits for green in the buffer (memory)
+localparam c_blue  =  4;
   wire [17:0] read_addr = 8'd80 * row + col;
   reg  [c_nb_buf-1:0] buffer[c_img_pxls-1:0];
 
@@ -46,6 +49,9 @@ module frame_buff
     g  <= {1'b0, buffer[read_addr][c_nb_buf-c_red-1:c_blue]};
     b  <= {2'b0, buffer[read_addr][c_blue-1:0]};
 
+    // r  <= {buffer[read_addr][c_nb_buf-1: c_nb_buf-c_red]};
+    // g  <= {buffer[read_addr][c_nb_buf-c_red-1:c_blue]};
+    // b  <= {buffer[read_addr][c_blue-1:0]};
   end
 
 endmodule
